@@ -70,7 +70,6 @@ public class MGPInterface extends javax.swing.JFrame {
         bComboBox = new javax.swing.JComboBox();
         jLabel9 = new javax.swing.JLabel();
         jButton3 = new javax.swing.JButton();
-        chartPanel = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -124,17 +123,6 @@ public class MGPInterface extends javax.swing.JFrame {
             }
         });
 
-        javax.swing.GroupLayout chartPanelLayout = new javax.swing.GroupLayout(chartPanel);
-        chartPanel.setLayout(chartPanelLayout);
-        chartPanelLayout.setHorizontalGroup(
-            chartPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 531, Short.MAX_VALUE)
-        );
-        chartPanelLayout.setVerticalGroup(
-            chartPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 177, Short.MAX_VALUE)
-        );
-
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -142,7 +130,6 @@ public class MGPInterface extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(chartPanel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 531, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jButton2)
@@ -216,9 +203,7 @@ public class MGPInterface extends javax.swing.JFrame {
                     .addComponent(jLabel8))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton3)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chartPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(8, 8, 8)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -264,7 +249,7 @@ public class MGPInterface extends javax.swing.JFrame {
                 result.getVector()
             },
             new String [] {
-                "area", "whalf", "w10", "h", "rho", "granularity", "aperture", "sigma", "skewness", "kurtosis"
+                "area", "whalf", "w10", "h", "rho", "granularity", "aperture dim.", "sigma", "skewness", "kurtosis"
             }
         ));
         Prefs.set("RITMGP.refl", reflTextField.getText());
@@ -286,7 +271,6 @@ public class MGPInterface extends javax.swing.JFrame {
     private javax.swing.JTextField areaTextField;
     private javax.swing.JComboBox bComboBox;
     private javax.swing.JCheckBox baseCheckBox;
-    private javax.swing.JPanel chartPanel;
     private javax.swing.JComboBox dComboBox;
     private javax.swing.JTextField fStopTextField;
     private javax.swing.JTextField fovTextField;

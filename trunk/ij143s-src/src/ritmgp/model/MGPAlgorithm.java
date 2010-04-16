@@ -79,7 +79,7 @@ public class MGPAlgorithm {
         //correct for illumination variations
 
         //raw BRDF and noise functions
-        double[] BRDF0 = new double[diff.getRows()];
+        double[] BRDF0 = new double[diff.getCols()];
 
         for(int j = 0; j < BRDF0.length; j++){
             BRDF0[j] = MathUtil.avg(diffF.selectCol(j));
@@ -112,7 +112,7 @@ public class MGPAlgorithm {
         //calculate the angles
         double errorAngle  = Math.atan(fov/(workingDist * 2)) * 180 / Math.PI;
         double k = (numCols - 1) / fov;
-        final double ap = Math.pow(1 / k, 2);//part of final result
+        final double ap = 1000 / k;//part of final result
         double fresnells = instAngle / 2;
         double jc = (k * fov) / 2 * Math.sin(fresnells * Math.PI / 180) + jp;
 
@@ -139,7 +139,7 @@ public class MGPAlgorithm {
         int[] IM = new int[numCols];
 
         for(int j = 0; j < IM.length; j++){
-            IM[j] = alpha1[j] == Double.NaN ? numCols : j;
+            IM[j] = alpha1[j] == Double.NaN ? numCols - 1 : j;
         }
         
         int JIM = MathUtil.min(IM);
