@@ -216,50 +216,53 @@ public class MGPInterface extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        ImagePlus bright = WindowManager.getImage(bComboBox.getSelectedItem().toString());
-        ImagePlus dark = WindowManager.getImage(dComboBox.getSelectedItem().toString());
-        double refRefl = Double.parseDouble(reflTextField.getText());
-        double refArea = Double.parseDouble(areaTextField.getText());
-        double fStop = Double.parseDouble(fStopTextField.getText());
-        double fov = Double.parseDouble(fovTextField.getText());
-        boolean baseline = baseCheckBox.isSelected();
-        double leftAngle = baseline ? 0 : Double.parseDouble(leftTextField.getText());
-        double rightAngle = baseline ? 0 : Double.parseDouble(rightTextField.getText());
-        MGPAlgorithm algo = new MGPAlgorithm(bright, dark, refArea, refRefl,
-                fov, fStop, baseline, leftAngle, rightAngle);
-        MGPResult result = algo.measureGloss();
-        //graph it, show the results
-        //if baseline then use the angles from the result, otherwise use leftAngle and rightAngle
+        try {
+            ImagePlus bright = WindowManager.getImage(bComboBox.getSelectedItem().toString());
+            ImagePlus dark = WindowManager.getImage(dComboBox.getSelectedItem().toString());
+            double refRefl = Double.parseDouble(reflTextField.getText());
+            double refArea = Double.parseDouble(areaTextField.getText());
+            double fStop = Double.parseDouble(fStopTextField.getText());
+            double fov = Double.parseDouble(fovTextField.getText());
+            boolean baseline = baseCheckBox.isSelected();
+            double leftAngle = baseline ? 0 : Double.parseDouble(leftTextField.getText());
+            double rightAngle = baseline ? 0 : Double.parseDouble(rightTextField.getText());
+            MGPAlgorithm algo = new MGPAlgorithm(bright, dark, refArea, refRefl,
+                    fov, fStop, baseline, leftAngle, rightAngle);
+            MGPResult result = algo.measureGloss();
+            //graph it, show the results
+            //if baseline then use the angles from the result, otherwise use leftAngle and rightAngle
         /*
-         * XYSeries series = new XYSeries("Average Size");
+             * XYSeries series = new XYSeries("Average Size");
             series.add(20.0, 10.0);
             series.add(40.0, 20.0);
             series.add(70.0, 50.0);
             XYDataset xyDataset = new XYSeriesCollection(series);
-         */
-        double[] xs = result.getAlpha();
-        Plot BRDF = new Plot("BRDF", "alpha", "intensity", xs, result.getBRDF());
-        System.out.println(xs.length);
-        System.out.println(result.getBRDF().length);
-        BRDF.setLimits(MathUtil.min(xs), MathUtil.max(xs),
-                MathUtil.min(result.getBRDF()), MathUtil.max(result.getBRDF()));
-        BRDF.show();
-        resultsTable.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                result.getVector()
-            },
-            new String [] {
-                "area", "whalf", "w10", "h", "rho", "granularity", "aperture dim.", "sigma", "skewness", "kurtosis"
-            }
-        ));
-        Prefs.set("RITMGP.refl", reflTextField.getText());
-        Prefs.set("RITMGP.area", areaTextField.getText());
-        Prefs.set("RITMGP.exp", fStopTextField.getText());
-        Prefs.set("RITMGP.fov", fovTextField.getText());
-        Prefs.set("RITMGP.left", leftTextField.getText());
-        Prefs.set("RITMGP.right", rightTextField.getText());
-        Prefs.set("RITMGP.base", baseline);
-        Prefs.savePreferences();
+             */
+            double[] xs = result.getAlpha();
+            Plot BRDF = new Plot("BRDF", "alpha", "intensity", xs, result.getBRDF());
+            System.out.println(xs.length);
+            System.out.println(result.getBRDF().length);
+            BRDF.setLimits(MathUtil.min(xs), MathUtil.max(xs),
+                    MathUtil.min(result.getBRDF()), MathUtil.max(result.getBRDF()));
+            BRDF.show();
+            resultsTable.setModel(new javax.swing.table.DefaultTableModel(
+                    new Object[][]{
+                        result.getVector()
+                    },
+                    new String[]{
+                        "area", "whalf", "w10", "h", "rho", "granularity", "aperture dim.", "sigma", "skewness", "kurtosis"
+                    }));
+            Prefs.set("RITMGP.refl", reflTextField.getText());
+            Prefs.set("RITMGP.area", areaTextField.getText());
+            Prefs.set("RITMGP.exp", fStopTextField.getText());
+            Prefs.set("RITMGP.fov", fovTextField.getText());
+            Prefs.set("RITMGP.left", leftTextField.getText());
+            Prefs.set("RITMGP.right", rightTextField.getText());
+            Prefs.set("RITMGP.base", baseline);
+            Prefs.savePreferences();
+        } catch (NumberFormatException e) {
+            IJ.showMessage("Please enter a value in all editable fields.");
+        }
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void baseCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_baseCheckBoxActionPerformed
