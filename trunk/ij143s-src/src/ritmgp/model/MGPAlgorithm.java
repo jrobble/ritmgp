@@ -21,9 +21,9 @@ public class MGPAlgorithm {
     private double leftAngle;
     private double rightAngle;
 
-    private static double workingDist = 152.4; //6 inches in mm
+    private static double workingDist = 165; //6 inches in mm
     private static double instAngle = 10;
-    private static double cylDiam = 60; //cylinder diameter
+    private static double cylDiam = 20; //cylinder diameter
 
     public MGPAlgorithm(ImagePlus bright, ImagePlus dark, double refArea,
             double refReflect, double fov, double fStop, boolean autoBaseline,
@@ -55,16 +55,16 @@ public class MGPAlgorithm {
 
         Matrix diff = Matrix.zeroNegatives(diff0);
         //irradiance difference
-
+        
         //correct for illumination variations
         double[] sq = new double[diff.getRows()];
 
         for(int i = 0; i < sq.length; i++){
             sq[i] = MathUtil.avg(diff.selectRow(i));
         }
-
+        
         double[] ff = MathUtil.ksmooth(sq, diff.getRows() / 5);
-
+        
         double meanFF = MathUtil.avg(ff);
 
         double[][] diffFArr = new double[diff.getRows()][diff.getCols()];
@@ -77,14 +77,14 @@ public class MGPAlgorithm {
 
         Matrix diffF = new Matrix(diffFArr);
         //correct for illumination variations
-
+        System.out.println(Arrays.toString(diffF.selectRow(0)));
         //raw BRDF and noise functions
         double[] BRDF0 = new double[diff.getCols()];
 
         for(int j = 0; j < BRDF0.length; j++){
             BRDF0[j] = MathUtil.avg(diffF.selectCol(j));
         }
-
+        //System.out.println(Arrays.toString(BRDF0));
         double meanBRDF0 = MathUtil.avg(BRDF0);
         double maxBRDF0 = MathUtil.max(BRDF0);
         double minBRDF0 = MathUtil.min(BRDF0);
@@ -186,7 +186,6 @@ public class MGPAlgorithm {
             BRDF4[j] = MathUtil.linterp(alpha2, BRDF2, alpha[j]);
         }
 
-        System.out.println(Arrays.toString(BRDF4));
 
         double MaxBRDF4 = MathUtil.max(BRDF4);
 
@@ -405,7 +404,9 @@ public class MGPAlgorithm {
         double[][] ans = new double[image.getHeight()][image.getWidth()];
         for(int i = 0; i < image.getHeight(); i++){
             for(int j = 0; j < image.getWidth(); j++){
-                ans[i][j] = image.getPixel(i, j)[0];
+                ans[i][j] = image.getPixel(j, i)[0]; //getPixel takes x, y
+                                                    //which is backwards from
+                                                    //row, col
             }
         }
         return ans;
