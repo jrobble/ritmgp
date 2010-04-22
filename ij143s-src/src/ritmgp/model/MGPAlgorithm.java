@@ -38,7 +38,14 @@ public class MGPAlgorithm {
         this.rightAngle = rightAngle;
         this.fov = fov;
     }
-
+    
+    /**
+     * The algorithm coded here is copied directly from the MathCAD code
+     * in the docs folder of this project. Changes are noted inline with code.
+     * 
+     * @return A result object holding the result vector, the baseline angles
+     * used, the final BRDF, and the angles corresponding to the BRDF
+     */
     public MGPResult measureGloss(){
         Matrix brightMat = new Matrix(getPixels(bright));
         Matrix darkMat = new Matrix(getPixels(dark));
@@ -67,6 +74,7 @@ public class MGPAlgorithm {
         
         double meanFF = MathUtil.avg(ff);
 
+        //corresponds to deltaIF in MathCAD code
         double[][] diffFArr = new double[diff.getRows()][diff.getCols()];
 
         for(int i = 0; i < diffFArr.length; i++){
@@ -76,15 +84,17 @@ public class MGPAlgorithm {
         }
 
         Matrix diffF = new Matrix(diffFArr);
+        //SqF was never used after its creation, so it is not coded here
+
         //correct for illumination variations
-        System.out.println(Arrays.toString(diffF.selectRow(0)));
+        
         //raw BRDF and noise functions
         double[] BRDF0 = new double[diff.getCols()];
 
         for(int j = 0; j < BRDF0.length; j++){
             BRDF0[j] = MathUtil.avg(diffF.selectCol(j));
         }
-        //System.out.println(Arrays.toString(BRDF0));
+        System.out.println(Arrays.toString(BRDF0));
         double meanBRDF0 = MathUtil.avg(BRDF0);
         double maxBRDF0 = MathUtil.max(BRDF0);
         double minBRDF0 = MathUtil.min(BRDF0);
