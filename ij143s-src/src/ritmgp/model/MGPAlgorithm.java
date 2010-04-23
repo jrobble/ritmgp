@@ -64,7 +64,7 @@ public class MGPAlgorithm {
         //irradiance difference
         
         //correct for illumination variations
-        double[] sq = new double[diff.getRows()];
+        double[] sq = new double[numRows];
 
         for(int i = 0; i < sq.length; i++){
             sq[i] = MathUtil.avg(diff.selectRow(i));
@@ -75,7 +75,7 @@ public class MGPAlgorithm {
         double meanFF = MathUtil.avg(ff);
 
         //corresponds to deltaIF in MathCAD code
-        double[][] diffFArr = new double[diff.getRows()][diff.getCols()];
+        double[][] diffFArr = new double[numRows][numCols];
 
         for(int i = 0; i < diffFArr.length; i++){
             for(int j = 0; j < diffFArr[0].length;j++){
@@ -89,17 +89,16 @@ public class MGPAlgorithm {
         //correct for illumination variations
         
         //raw BRDF and noise functions
-        double[] BRDF0 = new double[diff.getCols()];
+        double[] BRDF0 = new double[numCols];
 
         for(int j = 0; j < BRDF0.length; j++){
             BRDF0[j] = MathUtil.avg(diffF.selectCol(j));
         }
-        System.out.println(Arrays.toString(BRDF0));
-        double meanBRDF0 = MathUtil.avg(BRDF0);
-        double maxBRDF0 = MathUtil.max(BRDF0);
+        
+        //meanBRDF0 and maxBRDF0 were not used so they are not calculated here
         double minBRDF0 = MathUtil.min(BRDF0);
 
-        double[] BRDF1 = new double[BRDF0.length];
+        double[] BRDF1 = new double[numCols];
 
         for(int j = 0; j < BRDF0.length; j++){
             BRDF1[j] = BRDF0[j] - minBRDF0;
@@ -123,24 +122,15 @@ public class MGPAlgorithm {
         double errorAngle  = Math.atan(fov/(workingDist * 2)) * 180 / Math.PI;
         double k = (numCols - 1) / fov;
         final double ap = 1000 / k;//part of final result
-        double fresnells = instAngle / 2;
+        double fresnells = instAngle / 2;//corresponds to theta in MathCAD
         double jc = (k * fov) / 2 * Math.sin(fresnells * Math.PI / 180) + jp;
-
+        
         double[] beta1 = new double[numCols];
-
-        for(int j = 0; j < beta1.length; j++){
+        double[] beta = new double[numCols];
+        double[] alpha1 = new double[numCols];
+        for(int j = 0; j < numCols; j++){
             beta1[j] = Math.asin(2 * (jc - j) / (k * cylDiam)) * 180 / Math.PI;
-        }
-
-        double[] beta = new double[beta1.length];
-
-        for(int j = 0; j < beta.length; j++){
             beta[j] = beta1[j] * 1 / ((errorAngle / 90) + 1);
-        }
-
-        double[] alpha1 = new double[beta.length];
-
-        for(int j = 0; j < alpha1.length; j++){
             alpha1[j] = fresnells - beta[j];
         }
         //calculate the angles
@@ -149,7 +139,7 @@ public class MGPAlgorithm {
         int[] IM = new int[numCols];
 
         for(int j = 0; j < IM.length; j++){
-            IM[j] = alpha1[j] == Double.NaN ? numCols - 1 : j;
+            IM[j] =  Double.isNaN(alpha1[j]) ? numCols - 1 : j;
         }
         
         int JIM = MathUtil.min(IM);
@@ -159,52 +149,46 @@ public class MGPAlgorithm {
         for(int j = 0; j < alpha2.length; j++){
             alpha2[j] = (j < JIM) ? alpha1[JIM] : alpha1[j];
         }
-
+        
         double[] BRDF2 = new double[numCols];
 
         for(int j = 0; j < BRDF2.length; j++){
             BRDF2[j] = (j < JIM) ? BRDF1[JIM] : BRDF1[j];
         }
-
+        
         double[] noise2 = new double[numCols];
 
         for(int j = 0; j < noise2.length; j++){
             noise2[j] = (j < JIM) ? noise1[JIM] : noise1[j];
         }
-
-        double MaxBRDF2 = MathUtil.max(BRDF2);
+        
+        //MaxBRDF2 was not used in MathCAD so it is not coded here
         //eliminate imaginary angles
 
         //Generate functions at equally spaced angles
+        //alpha3 was created for MathCAD trickery
+        //it is not used here
         double alpha2Min = MathUtil.min(alpha2);
         double alpha2Max = MathUtil.max(alpha2);
 
         double alphaInt = (alpha2Max - alpha2Min) / numCols;
 
         double[] alpha = new double[numCols];
-        for(int j = 0; j < alpha.length; j++){
-            alpha[j] = j * alphaInt + alpha2Min;
-        }
-        
-        double alphaMin = MathUtil.min(alpha);
-        double alphaMax = MathUtil.max(alpha);
-
         double[] BRDF4 = new double[numCols]; //BRDF3 skipped because it is
                                               //unnecessary in this program but
                                               //names should be consistent
-        for(int j = 0; j < BRDF4.length; j++){
-            BRDF4[j] = MathUtil.linterp(alpha2, BRDF2, alpha[j]);
-        }
-
-
-        double MaxBRDF4 = MathUtil.max(BRDF4);
-
-        double[] noise = new double[numCols]; //noise3 skipped because it is
+         double[] noise = new double[numCols];//noise3 skipped because it is
                                               //unnecessary in this program but
                                               //names should be consistent
-        for(int j = 0; j < noise.length; j++){
+        for(int j = 0; j < numCols; j++){
+            alpha[j] = j * alphaInt + alpha2Min;
+            BRDF4[j] = MathUtil.linterp(alpha2, BRDF2, alpha[j]);
             noise[j] = MathUtil.linterp(alpha2, noise2, alpha[j]);
         }
+        System.out.println(Arrays.toString(BRDF4));
+        double alphaMin = MathUtil.min(alpha);
+        double alphaMax = MathUtil.max(alpha);
+        double MaxBRDF4 = MathUtil.max(BRDF4);
 
         final double granularity = MathUtil.max(noise);
         //Generate functions at equally spaced angles
@@ -274,17 +258,13 @@ public class MGPAlgorithm {
         double[] Y = {vLeft, vRight};
 
         double[] VB = new double[numCols];
-        for(int j = 0; j < VB.length; j++){
-            VB[j] = MathUtil.linterp(X, Y, alpha[j]);
-        }
-
         double[] BRDF5 = new double[numCols];
-        for(int j = 0; j < VB.length; j++){
-            BRDF5[j] = BRDF4[j] - VB[j];
-        }
-
         double[] BRDF6 = new double[numCols];
-        for (int j = 0; j < BRDF6.length; j++) {
+        double[] BRDFx = new double[numCols];
+        double[] BRDF7 = new double[numCols];
+        for(int j = 0; j < numCols; j++){
+            VB[j] = MathUtil.linterp(X, Y, alpha[j]);
+            BRDF5[j] = BRDF4[j] - VB[j];
             if (alpha[j] < alphaLeft) {
                 BRDF6[j] = 0;
             } else if (alpha[j] > alphaRight) {
@@ -292,15 +272,7 @@ public class MGPAlgorithm {
             } else {
                 BRDF6[j] = BRDF5[j];
             }
-        }
-
-        double[] BRDFx = new double[numCols];
-        for (int j = 0; j < BRDFx.length; j++) {
             BRDFx[j] = BRDF6[j] - VB[j];
-        }
-
-        double[] BRDF7 = new double[numCols];
-        for (int j = 0; j < BRDF7.length; j++) {
             BRDF7[j] = BRDFx[j] < 0 ? 0 : BRDFx[j];
         }
         //baseline correction

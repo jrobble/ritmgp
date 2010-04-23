@@ -12,7 +12,8 @@ public class MGPResult {
     private double rightAngle;
     private double[] alpha;
 
-    MGPResult(Double[] results, double[] BRDF, double leftAngle, double rightAngle, double[] alpha) {
+    MGPResult(Double[] results, double[] BRDF, double leftAngle,
+            double rightAngle, double[] alpha) {
         resVector = results;
         this.BRDF = BRDF;
         this.leftAngle = leftAngle;
