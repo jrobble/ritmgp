@@ -48,8 +48,10 @@ public class MathUtil {
 
     public static double linterp(double[] xs, double[] ys, double x){
         int index = 0;
-        for(index = 0; index < xs.length - 1 && xs[index] <= x &&
-                xs[index + 1] > x; index++);
+        for(;index < xs.length - 1; index++){
+            if(xs[index] <= x && xs[index + 1] > x) break;
+        }
+        if(xs[index] == x) return ys[index]; //exact match
         if(index == xs.length - 1) index--;
         return linterp(xs[index], ys[index], xs[index + 1], ys[index + 1], x);
     }
@@ -92,7 +94,7 @@ public class MathUtil {
         for(double elem : array){
             if(elem > max) max = elem;
         }
-
+        
         return max;
     }
 
