@@ -21,7 +21,7 @@ public class MGPResult {
         this.alpha = alpha;
     }
 
-    public Object[] getVector() {
+    public Double[] getVector() {
         return resVector;
     }
 

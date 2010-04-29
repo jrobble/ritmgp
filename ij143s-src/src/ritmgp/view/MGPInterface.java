@@ -5,13 +5,13 @@ import ij.ImagePlus;
 import ij.Prefs;
 import ij.WindowManager;
 import ij.gui.Plot;
+import java.awt.Color;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Arrays;
+import java.io.PrintWriter;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import javax.swing.JFileChooser;
 import ritmgp.model.MGPAlgorithm;
 import ritmgp.model.MGPResult;
 import ritmgp.util.MathUtil;
@@ -23,6 +23,7 @@ import ritmgp.util.MathUtil;
 public class MGPInterface extends javax.swing.JFrame {
 
     private String[] imageTitles;
+    private Double[] resVec;
     /** Creates new form InterfaceDemo */
     public MGPInterface(String[] imageTitles) {
         initComponents();
@@ -49,8 +50,7 @@ public class MGPInterface extends javax.swing.JFrame {
 
         jScrollPane1 = new javax.swing.JScrollPane();
         resultsTable = new javax.swing.JTable();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
+        saveVecButton = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
@@ -83,9 +83,12 @@ public class MGPInterface extends javax.swing.JFrame {
         ));
         jScrollPane1.setViewportView(resultsTable);
 
-        jButton1.setText("Save result vector");
-
-        jButton2.setText("Save BRDF");
+        saveVecButton.setText("Save result vector");
+        saveVecButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                saveVecButtonActionPerformed(evt);
+            }
+        });
 
         jLabel1.setText("Bright Image:");
 
@@ -130,11 +133,8 @@ public class MGPInterface extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 531, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jButton2)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton1))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 566, Short.MAX_VALUE)
+                    .addComponent(saveVecButton)
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                         .addComponent(jLabel7)
                         .addGap(20, 20, 20)
@@ -206,9 +206,7 @@ public class MGPInterface extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(8, 8, 8)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton1)
-                    .addComponent(jButton2))
+                .addComponent(saveVecButton)
                 .addContainerGap())
         );
 
@@ -229,25 +227,23 @@ public class MGPInterface extends javax.swing.JFrame {
             MGPAlgorithm algo = new MGPAlgorithm(bright, dark, refArea, refRefl,
                     fov, fStop, baseline, leftAngle, rightAngle);
             MGPResult result = algo.measureGloss();
-            //graph it, show the results
-            //if baseline then use the angles from the result, otherwise use leftAngle and rightAngle
-        /*
-             * XYSeries series = new XYSeries("Average Size");
-            series.add(20.0, 10.0);
-            series.add(40.0, 20.0);
-            series.add(70.0, 50.0);
-            XYDataset xyDataset = new XYSeriesCollection(series);
-             */
             double[] xs = result.getAlpha();
             Plot BRDF = new Plot("BRDF", "alpha", "intensity", xs, result.getBRDF());
-            System.out.println(xs.length);
-            System.out.println(result.getBRDF().length);
             BRDF.setLimits(MathUtil.min(xs), MathUtil.max(xs),
-                    MathUtil.min(result.getBRDF()), MathUtil.max(result.getBRDF()));
+                    MathUtil.min(result.getBRDF()) - MathUtil.max(result.getBRDF()) / 5,
+                    MathUtil.max(result.getBRDF()));
+            double baselineX1 = result.getLeftAngle();
+            double baselineY1 = MathUtil.linterp(xs, result.getBRDF(), baselineX1);
+            double baselineX2 = result.getRightAngle();
+            double baselineY2 = MathUtil.linterp(xs, result.getBRDF(), baselineX2);
+            BRDF.draw();
+            BRDF.setColor(Color.red);
+            BRDF.drawLine(baselineX1, baselineY1, baselineX2, baselineY2);
             BRDF.show();
+            resVec = result.getVector();
             resultsTable.setModel(new javax.swing.table.DefaultTableModel(
                     new Object[][]{
-                        result.getVector()
+                        resVec
                     },
                     new String[]{
                         "area", "whalf", "w10", "h", "rho", "granularity", "aperture dim.", "sigma", "skewness", "kurtosis"
@@ -270,6 +266,37 @@ public class MGPInterface extends javax.swing.JFrame {
         rightTextField.setEditable(!baseCheckBox.isSelected());
     }//GEN-LAST:event_baseCheckBoxActionPerformed
 
+    private void saveVecButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveVecButtonActionPerformed
+        if(resVec == null){
+            IJ.showMessage("No results yet!");
+            return;
+        }
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setMultiSelectionEnabled(false);
+        if(fileChooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION){
+            PrintWriter vecFile = null;
+            try {
+                vecFile = new PrintWriter(new BufferedWriter(new FileWriter(
+                        fileChooser.getSelectedFile())));
+                String[] titles = {"area", "whalf", "w10", "h", "rho",
+                "granularity", "aperture dim.", "sigma", "skewness", "kurtosis"};
+                for(int i = 0; i < resVec.length;i++){
+                    vecFile.println(titles[i] + "\t" + resVec[i]);
+                }
+            } catch (IOException ex) {
+                IJ.showMessage("Error writing to file, " + 
+                        fileChooser.getSelectedFile().getName() + ": " +
+                        ex.getMessage());
+            }finally{
+                if(vecFile != null){
+                    vecFile.close();
+                }
+            }
+            
+        }
+
+    }//GEN-LAST:event_saveVecButtonActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField areaTextField;
     private javax.swing.JComboBox bComboBox;
@@ -277,8 +304,6 @@ public class MGPInterface extends javax.swing.JFrame {
     private javax.swing.JComboBox dComboBox;
     private javax.swing.JTextField fStopTextField;
     private javax.swing.JTextField fovTextField;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
@@ -294,6 +319,7 @@ public class MGPInterface extends javax.swing.JFrame {
     private javax.swing.JTextField reflTextField;
     private javax.swing.JTable resultsTable;
     private javax.swing.JTextField rightTextField;
+    private javax.swing.JButton saveVecButton;
     // End of variables declaration//GEN-END:variables
 
     private void initComboBoxes() {
