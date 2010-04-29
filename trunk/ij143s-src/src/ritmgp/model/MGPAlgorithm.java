@@ -185,7 +185,7 @@ public class MGPAlgorithm {
             BRDF4[j] = MathUtil.linterp(alpha2, BRDF2, alpha[j]);
             noise[j] = MathUtil.linterp(alpha2, noise2, alpha[j]);
         }
-        System.out.println(Arrays.toString(BRDF4));
+
         double alphaMin = MathUtil.min(alpha);
         double alphaMax = MathUtil.max(alpha);
         double MaxBRDF4 = MathUtil.max(BRDF4);
@@ -216,7 +216,8 @@ public class MGPAlgorithm {
         double alphaBase = alphaX > alphaLimit ? alphaLimit : alphaX;
 
         int[] JWL = new int[numCols];
-        for (int j = 0; j < JWL.length; j++) {
+        int[] JWR = new int[numCols];
+        for (int j = 0; j < numCols; j++) {
             if (alpha[j] > 0) {
                 JWL[j] = 0;
             } else if (alpha[j] > -alphaBase) {
@@ -225,20 +226,17 @@ public class MGPAlgorithm {
                 JWL[j] = j;
             }
         }
-
+        
         int JL = MathUtil.max(JWL);
-
-        int[] JWR = new int[numCols];
-        for (int j = 0; j < JWR.length; j++) {
+        for (int j = 0; j < numCols; j++) {
             if (alpha[j] < 0) {
                 JWR[j] = 0;
-            } else if (alpha[j] > -alpha[JLv]) {
+            } else if (alpha[j] > -alpha[JL]) {
                 JWR[j] = 0;
             } else {
                 JWR[j] = j;
             }
         }
-
         int JR = MathUtil.max(JWR);
         //auto baseline
 
@@ -254,13 +252,13 @@ public class MGPAlgorithm {
         double vLeft = BRDF4[JL];
         double vRight = BRDF4[JR];
 
-        double[] X = {0, 1};
+        double[] X = {alphaLeft, alphaRight};
         double[] Y = {vLeft, vRight};
 
         double[] VB = new double[numCols];
         double[] BRDF5 = new double[numCols];
         double[] BRDF6 = new double[numCols];
-        double[] BRDFx = new double[numCols];
+        double[] BRDF77 = new double[numCols];
         double[] BRDF7 = new double[numCols];
         for(int j = 0; j < numCols; j++){
             VB[j] = MathUtil.linterp(X, Y, alpha[j]);
@@ -272,11 +270,18 @@ public class MGPAlgorithm {
             } else {
                 BRDF6[j] = BRDF5[j];
             }
-            BRDFx[j] = BRDF6[j] - VB[j];
-            BRDF7[j] = BRDFx[j] < 0 ? 0 : BRDFx[j];
+            BRDF77[j] = BRDF6[j] - VB[j];
+            BRDF7[j] = BRDF77[j] < 0 ? 0 : BRDF77[j];
         }
         //baseline correction
-
+        System.out.println(Arrays.toString(BRDF0));
+        System.out.println(Arrays.toString(BRDF1));
+        System.out.println(Arrays.toString(BRDF2));
+        System.out.println(Arrays.toString(BRDF4));
+        System.out.println(Arrays.toString(BRDF5));
+        System.out.println(Arrays.toString(BRDF6));
+        System.out.println(Arrays.toString(BRDF7));
+        System.out.println(Arrays.toString(BRDF77));
         //calibrating the BRDF
         double A0 = 0;
         double[] BRDF8 = new double[numCols];
@@ -317,15 +322,11 @@ public class MGPAlgorithm {
         int halfL = MathUtil.max(halfLV);
         int halfR = MathUtil.max(halfRV);
 
-        double vwLeft = BRDF8[halfL];
-        double vwRight = BRDF8[halfR];
-
+        //VwLeft and VwRight were only used to create Yw which was not used
         double alphaWL = alpha[halfL];
         double alphaWR = alpha[halfR];
 
-        double[] Xw = {alphaWL, alphaWR};
-        double[] Yw = {vwLeft, vwRight};
-
+        //Xw and Yw were not used
         final double wHalf = alphaWR - alphaWL;
 
         double h10 = h / 10;
@@ -353,15 +354,11 @@ public class MGPAlgorithm {
         int tenthL = MathUtil.max(tenthLV);
         int tenthR = MathUtil.max(tenthRV);
 
-        double v10Left = BRDF8[tenthL];
-        double v10Right = BRDF8[tenthR];
-
+        //v10Left and v10Right were only used to create Y10 which was not used
         double alpha10L = alpha[tenthL];
         double alpha10R = alpha[tenthR];
 
-        double[] X10 = {alpha10L, alpha10R};
-        double[] Y10 = {v10Left, v10Right};
-
+        //X10 and Y10 were not used
         final double w10 = alpha10R - alpha10L;
 
         double M2 = 0, M3 = 0, M4 = 0;
@@ -379,7 +376,7 @@ public class MGPAlgorithm {
 
         Double[] results = {A, wHalf, w10, h, rho, granularity, ap,
                             sigma, skewness, kurtosis};
-        return new MGPResult(results, BRDF8, alphaLeft, alphaRight, alpha);
+        return new MGPResult(results, BRDF2, alphaLeft, alphaRight, alpha);
     }
 
     private double[][] getPixels(ImagePlus image) {
