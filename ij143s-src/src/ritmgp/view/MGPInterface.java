@@ -252,8 +252,10 @@ public class MGPInterface extends javax.swing.JFrame {
             Prefs.set("RITMGP.area", areaTextField.getText());
             Prefs.set("RITMGP.exp", fStopTextField.getText());
             Prefs.set("RITMGP.fov", fovTextField.getText());
-            Prefs.set("RITMGP.left", leftTextField.getText());
-            Prefs.set("RITMGP.right", rightTextField.getText());
+            Prefs.set("RITMGP.left", leftTextField.isEditable() ?
+                leftTextField.getText() : "");
+            Prefs.set("RITMGP.right", rightTextField.isEditable() ?
+                rightTextField.getText() : "");
             Prefs.set("RITMGP.base", baseline);
             Prefs.savePreferences();
         } catch (NumberFormatException e) {
@@ -328,7 +330,6 @@ public class MGPInterface extends javax.swing.JFrame {
     }
 
     private void initTextFields() {
-        System.out.println("RITMGP.refl: "+Prefs.get("RITMGP.refl", "no value"));
         reflTextField.setText(Prefs.get("RITMGP.refl", ""));
         areaTextField.setText(Prefs.get("RITMGP.area", ""));
         fStopTextField.setText(Prefs.get("RITMGP.exp", ""));
@@ -336,5 +337,6 @@ public class MGPInterface extends javax.swing.JFrame {
         baseCheckBox.setSelected(Prefs.getBoolean("RITMGP.base", false));
         leftTextField.setText(Prefs.get("RITMGP.left", ""));
         rightTextField.setText(Prefs.get("RITMGP.right", ""));
+        baseCheckBox.setSelected(Prefs.getBoolean("RITMGP.base", false));
     }
 }
