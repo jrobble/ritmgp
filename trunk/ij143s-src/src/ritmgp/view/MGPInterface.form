@@ -25,7 +25,7 @@
           <Group type="102" alignment="1" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="1" attributes="0">
-                  <Component id="jScrollPane1" alignment="1" pref="566" max="32767" attributes="0"/>
+                  <Component id="jScrollPane1" alignment="1" pref="609" max="32767" attributes="0"/>
                   <Component id="saveVecButton" alignment="1" min="-2" max="-2" attributes="0"/>
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="jLabel7" min="-2" max="-2" attributes="0"/>
@@ -136,7 +136,7 @@
                 <Column editable="true" title="h" type="java.lang.Object"/>
                 <Column editable="true" title="rho" type="java.lang.Object"/>
                 <Column editable="true" title="granularity" type="java.lang.Object"/>
-                <Column editable="true" title="aperture" type="java.lang.Object"/>
+                <Column editable="true" title="aperture dim." type="java.lang.Object"/>
                 <Column editable="true" title="sigma" type="java.lang.Object"/>
                 <Column editable="true" title="skewness" type="java.lang.Object"/>
                 <Column editable="true" title="kurtosis" type="java.lang.Object"/>
