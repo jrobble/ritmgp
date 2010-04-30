@@ -78,7 +78,7 @@ public class MGPInterface extends javax.swing.JFrame {
                 {null, null, null, null, null, null, null, null, null, null}
             },
             new String [] {
-                "area", "whalf", "w10", "h", "rho", "granularity", "aperture", "sigma", "skewness", "kurtosis"
+                "area", "whalf", "w10", "h", "rho", "granularity", "aperture dim.", "sigma", "skewness", "kurtosis"
             }
         ));
         jScrollPane1.setViewportView(resultsTable);
@@ -133,7 +133,7 @@ public class MGPInterface extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 566, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 609, Short.MAX_VALUE)
                     .addComponent(saveVecButton)
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                         .addComponent(jLabel7)
