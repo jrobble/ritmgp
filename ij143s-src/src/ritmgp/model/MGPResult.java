@@ -7,15 +7,17 @@ package ritmgp.model;
  */
 public class MGPResult {
     private Double[] resVector;
-    private double[] BRDF;
+    private double[] graphBRDF;
+    private double[] finalBRDF;
     private double leftAngle;
     private double rightAngle;
     private double[] alpha;
 
-    MGPResult(Double[] results, double[] BRDF, double leftAngle,
-            double rightAngle, double[] alpha) {
+    MGPResult(Double[] results, double[] graphBRDF, double leftAngle,
+            double rightAngle, double[] alpha, double[] finalBRDF) {
         resVector = results;
-        this.BRDF = BRDF;
+        this.graphBRDF = graphBRDF;
+        this.finalBRDF = finalBRDF;
         this.leftAngle = leftAngle;
         this.rightAngle = rightAngle;
         this.alpha = alpha;
@@ -25,8 +27,8 @@ public class MGPResult {
         return resVector;
     }
 
-    public double[] getBRDF() {
-        return BRDF;
+    public double[] getGraphBRDF() {
+        return graphBRDF;
     }
 
     public double getLeftAngle() {
@@ -39,5 +41,9 @@ public class MGPResult {
 
     public double[] getAlpha(){
         return alpha;
+    }
+
+    public double[] getFinalBRDF() {
+        return finalBRDF;
     }
 }
