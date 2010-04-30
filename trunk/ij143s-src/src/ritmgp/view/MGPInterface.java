@@ -23,7 +23,7 @@ import ritmgp.util.MathUtil;
 public class MGPInterface extends javax.swing.JFrame {
 
     private String[] imageTitles;
-    private Double[] resVec;
+    private MGPResult result;
     /** Creates new form InterfaceDemo */
     public MGPInterface(String[] imageTitles) {
         initComponents();
@@ -70,6 +70,7 @@ public class MGPInterface extends javax.swing.JFrame {
         bComboBox = new javax.swing.JComboBox();
         jLabel9 = new javax.swing.JLabel();
         jButton3 = new javax.swing.JButton();
+        saveBRDFButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -84,6 +85,7 @@ public class MGPInterface extends javax.swing.JFrame {
         jScrollPane1.setViewportView(resultsTable);
 
         saveVecButton.setText("Save result vector");
+        saveVecButton.setToolTipText("Save the above table");
         saveVecButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 saveVecButtonActionPerformed(evt);
@@ -126,6 +128,14 @@ public class MGPInterface extends javax.swing.JFrame {
             }
         });
 
+        saveBRDFButton.setText("Save BRDF");
+        saveBRDFButton.setToolTipText("Save the final, baseline-corrected BRDF");
+        saveBRDFButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                saveBRDFButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -134,7 +144,10 @@ public class MGPInterface extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 609, Short.MAX_VALUE)
-                    .addComponent(saveVecButton)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(saveBRDFButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(saveVecButton))
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                         .addComponent(jLabel7)
                         .addGap(20, 20, 20)
@@ -206,7 +219,9 @@ public class MGPInterface extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(8, 8, 8)
-                .addComponent(saveVecButton)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(saveVecButton)
+                    .addComponent(saveBRDFButton))
                 .addContainerGap())
         );
 
@@ -226,24 +241,23 @@ public class MGPInterface extends javax.swing.JFrame {
             double rightAngle = baseline ? 0 : Double.parseDouble(rightTextField.getText());
             MGPAlgorithm algo = new MGPAlgorithm(bright, dark, refArea, refRefl,
                     fov, fStop, baseline, leftAngle, rightAngle);
-            MGPResult result = algo.measureGloss();
+            result = algo.measureGloss();
             double[] xs = result.getAlpha();
-            Plot BRDF = new Plot("BRDF", "alpha", "intensity", xs, result.getBRDF());
+            Plot BRDF = new Plot("BRDF", "alpha", "intensity", xs, result.getGraphBRDF());
             BRDF.setLimits(MathUtil.min(xs), MathUtil.max(xs),
-                    MathUtil.min(result.getBRDF()) - MathUtil.max(result.getBRDF()) / 5,
-                    MathUtil.max(result.getBRDF()));
+                    MathUtil.min(result.getGraphBRDF()) - MathUtil.max(result.getGraphBRDF()) / 5,
+                    MathUtil.max(result.getGraphBRDF()));
             double baselineX1 = result.getLeftAngle();
-            double baselineY1 = MathUtil.linterp(xs, result.getBRDF(), baselineX1);
+            double baselineY1 = MathUtil.linterp(xs, result.getGraphBRDF(), baselineX1);
             double baselineX2 = result.getRightAngle();
-            double baselineY2 = MathUtil.linterp(xs, result.getBRDF(), baselineX2);
+            double baselineY2 = MathUtil.linterp(xs, result.getGraphBRDF(), baselineX2);
             BRDF.draw();
             BRDF.setColor(Color.red);
             BRDF.drawLine(baselineX1, baselineY1, baselineX2, baselineY2);
             BRDF.show();
-            resVec = result.getVector();
             resultsTable.setModel(new javax.swing.table.DefaultTableModel(
                     new Object[][]{
-                        resVec
+                        result.getVector()
                     },
                     new String[]{
                         "area", "whalf", "w10", "h", "rho", "granularity", "aperture dim.", "sigma", "skewness", "kurtosis"
@@ -269,7 +283,7 @@ public class MGPInterface extends javax.swing.JFrame {
     }//GEN-LAST:event_baseCheckBoxActionPerformed
 
     private void saveVecButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveVecButtonActionPerformed
-        if(resVec == null){
+        if(result == null){
             IJ.showMessage("No results yet!");
             return;
         }
@@ -282,8 +296,8 @@ public class MGPInterface extends javax.swing.JFrame {
                         fileChooser.getSelectedFile())));
                 String[] titles = {"area", "whalf", "w10", "h", "rho",
                 "granularity", "aperture dim.", "sigma", "skewness", "kurtosis"};
-                for(int i = 0; i < resVec.length;i++){
-                    vecFile.println(titles[i] + "\t" + resVec[i]);
+                for(int i = 0; i < result.getVector().length;i++){
+                    vecFile.println(titles[i] + "\t" + result.getVector()[i]);
                 }
             } catch (IOException ex) {
                 IJ.showMessage("Error writing to file, " + 
@@ -298,6 +312,34 @@ public class MGPInterface extends javax.swing.JFrame {
         }
 
     }//GEN-LAST:event_saveVecButtonActionPerformed
+
+    private void saveBRDFButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveBRDFButtonActionPerformed
+        if(result == null){
+            IJ.showMessage("No results yet!");
+            return;
+        }
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setMultiSelectionEnabled(false);
+        if(fileChooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION){
+            PrintWriter brdfFile = null;
+            try {
+                brdfFile = new PrintWriter(new BufferedWriter(new FileWriter(
+                        fileChooser.getSelectedFile())));
+                for(int i = 0; i < result.getGraphBRDF().length;i++){
+                    brdfFile.println(result.getAlpha()[i] + "\t" + result.getFinalBRDF()[i]);
+                }
+            } catch (IOException ex) {
+                IJ.showMessage("Error writing to file, " +
+                        fileChooser.getSelectedFile().getName() + ": " +
+                        ex.getMessage());
+            }finally{
+                if(brdfFile != null){
+                    brdfFile.close();
+                }
+            }
+
+        }
+    }//GEN-LAST:event_saveBRDFButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField areaTextField;
@@ -321,6 +363,7 @@ public class MGPInterface extends javax.swing.JFrame {
     private javax.swing.JTextField reflTextField;
     private javax.swing.JTable resultsTable;
     private javax.swing.JTextField rightTextField;
+    private javax.swing.JButton saveBRDFButton;
     private javax.swing.JButton saveVecButton;
     // End of variables declaration//GEN-END:variables
 
@@ -338,5 +381,11 @@ public class MGPInterface extends javax.swing.JFrame {
         leftTextField.setText(Prefs.get("RITMGP.left", ""));
         rightTextField.setText(Prefs.get("RITMGP.right", ""));
         baseCheckBox.setSelected(Prefs.getBoolean("RITMGP.base", false));
+        if(baseCheckBox.isSelected()){
+            leftTextField.setEditable(false);
+            rightTextField.setEditable(false);
+            leftTextField.setText("");
+            rightTextField.setText("");
+        }
     }
 }

@@ -274,14 +274,14 @@ public class MGPAlgorithm {
             BRDF7[j] = BRDF77[j] < 0 ? 0 : BRDF77[j];
         }
         //baseline correction
-        System.out.println(Arrays.toString(BRDF0));
-        System.out.println(Arrays.toString(BRDF1));
-        System.out.println(Arrays.toString(BRDF2));
-        System.out.println(Arrays.toString(BRDF4));
-        System.out.println(Arrays.toString(BRDF5));
-        System.out.println(Arrays.toString(BRDF6));
-        System.out.println(Arrays.toString(BRDF7));
-        System.out.println(Arrays.toString(BRDF77));
+        System.out.println("BRDF0" + Arrays.toString(BRDF0));
+        System.out.println("BRDF1" + Arrays.toString(BRDF1));
+        System.out.println("BRDF2" + Arrays.toString(BRDF2));
+        System.out.println("BRDF4" + Arrays.toString(BRDF4));
+        System.out.println("BRDF5" + Arrays.toString(BRDF5));
+        System.out.println("BRDF6" + Arrays.toString(BRDF6));
+        System.out.println("BRDF7" + Arrays.toString(BRDF7));
+        System.out.println("BRDF77" + Arrays.toString(BRDF77));
         //calibrating the BRDF
         double A0 = 0;
         double[] BRDF8 = new double[numCols];
@@ -374,9 +374,9 @@ public class MGPAlgorithm {
         final double kurtosis = M4 / (M2 * M2) - 3;
         //stats
 
-        Double[] results = {A, wHalf, w10, h, rho, granularity, ap,
-                            sigma, skewness, kurtosis};
-        return new MGPResult(results, BRDF2, alphaLeft, alphaRight, alpha);
+        Double[] results = {A, wHalf, w10, h, rho, granularity, ap, sigma,
+                            skewness, kurtosis};
+        return new MGPResult(results, BRDF2, alphaLeft, alphaRight, alpha, BRDF8);
     }
 
     private double[][] getPixels(ImagePlus image) {
