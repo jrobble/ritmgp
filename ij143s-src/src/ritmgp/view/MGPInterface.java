@@ -10,6 +10,7 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JFileChooser;
 import ritmgp.model.MGPAlgorithm;
@@ -71,6 +72,7 @@ public class MGPInterface extends javax.swing.JFrame {
         jLabel9 = new javax.swing.JLabel();
         jButton3 = new javax.swing.JButton();
         saveBRDFButton = new javax.swing.JButton();
+        jButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -136,6 +138,13 @@ public class MGPInterface extends javax.swing.JFrame {
             }
         });
 
+        jButton1.setText("Refresh images");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -173,7 +182,9 @@ public class MGPInterface extends javax.swing.JFrame {
                             .addComponent(fStopTextField)
                             .addComponent(fovTextField))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel9))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel9)
+                            .addComponent(jButton1)))
                     .addComponent(baseCheckBox, javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jButton3, javax.swing.GroupLayout.Alignment.LEADING))
                 .addContainerGap())
@@ -188,7 +199,8 @@ public class MGPInterface extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
-                    .addComponent(dComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(dComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton1))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
@@ -341,6 +353,10 @@ public class MGPInterface extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_saveBRDFButtonActionPerformed
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        refreshImages();
+    }//GEN-LAST:event_jButton1ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField areaTextField;
     private javax.swing.JComboBox bComboBox;
@@ -348,6 +364,7 @@ public class MGPInterface extends javax.swing.JFrame {
     private javax.swing.JComboBox dComboBox;
     private javax.swing.JTextField fStopTextField;
     private javax.swing.JTextField fovTextField;
+    private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton3;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
@@ -370,6 +387,25 @@ public class MGPInterface extends javax.swing.JFrame {
     private void initComboBoxes() {
         bComboBox.setModel(new javax.swing.DefaultComboBoxModel(imageTitles));
         dComboBox.setModel(new javax.swing.DefaultComboBoxModel(imageTitles));
+    }
+
+    private void refreshImages() {
+        int[] wList = WindowManager.getIDList(); //ij.WindowManager
+        if (wList == null || wList.length < 2) {
+            imageTitles = new String[0];
+            initComboBoxes();
+            return;
+        }
+        ArrayList<String> titles = new ArrayList<String>(wList.length);
+        int i = 0;
+        for (int imgId : wList) {
+            ImagePlus imp = WindowManager.getImage(imgId);
+            if (imp != null) {
+                titles.add(imp.getTitle());
+            }
+        }
+        imageTitles = titles.toArray(new String[0]);
+        initComboBoxes();
     }
 
     private void initTextFields() {
