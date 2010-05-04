@@ -25,6 +25,7 @@ public class MGPInterface extends javax.swing.JFrame {
 
     private String[] imageTitles;
     private MGPResult result;
+
     /** Creates new form InterfaceDemo */
     public MGPInterface(String[] imageTitles) {
         initComponents();
@@ -241,6 +242,11 @@ public class MGPInterface extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        if (imageTitles.length == 0 || bComboBox.getSelectedItem() == null
+                || dComboBox.getSelectedItem() == null) {
+            IJ.showMessage("Missing at least one image selection.");
+            return;
+        }
         try {
             ImagePlus bright = WindowManager.getImage(bComboBox.getSelectedItem().toString());
             ImagePlus dark = WindowManager.getImage(dComboBox.getSelectedItem().toString());
@@ -278,10 +284,10 @@ public class MGPInterface extends javax.swing.JFrame {
             Prefs.set("RITMGP.area", areaTextField.getText());
             Prefs.set("RITMGP.exp", fStopTextField.getText());
             Prefs.set("RITMGP.fov", fovTextField.getText());
-            Prefs.set("RITMGP.left", leftTextField.isEditable() ?
-                leftTextField.getText() : "");
-            Prefs.set("RITMGP.right", rightTextField.isEditable() ?
-                rightTextField.getText() : "");
+            Prefs.set("RITMGP.left", leftTextField.isEditable()
+                    ? leftTextField.getText() : "");
+            Prefs.set("RITMGP.right", rightTextField.isEditable()
+                    ? rightTextField.getText() : "");
             Prefs.set("RITMGP.base", baseline);
             Prefs.savePreferences();
         } catch (NumberFormatException e) {
@@ -295,57 +301,57 @@ public class MGPInterface extends javax.swing.JFrame {
     }//GEN-LAST:event_baseCheckBoxActionPerformed
 
     private void saveVecButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveVecButtonActionPerformed
-        if(result == null){
+        if (result == null) {
             IJ.showMessage("No results yet!");
             return;
         }
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setMultiSelectionEnabled(false);
-        if(fileChooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION){
+        if (fileChooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
             PrintWriter vecFile = null;
             try {
                 vecFile = new PrintWriter(new BufferedWriter(new FileWriter(
                         fileChooser.getSelectedFile())));
                 String[] titles = {"area", "whalf", "w10", "h", "rho",
-                "granularity", "aperture dim.", "sigma", "skewness", "kurtosis"};
-                for(int i = 0; i < result.getVector().length;i++){
+                    "granularity", "aperture dim.", "sigma", "skewness", "kurtosis"};
+                for (int i = 0; i < result.getVector().length; i++) {
                     vecFile.println(titles[i] + "\t" + result.getVector()[i]);
                 }
             } catch (IOException ex) {
-                IJ.showMessage("Error writing to file, " + 
-                        fileChooser.getSelectedFile().getName() + ": " +
-                        ex.getMessage());
-            }finally{
-                if(vecFile != null){
+                IJ.showMessage("Error writing to file, "
+                        + fileChooser.getSelectedFile().getName() + ": "
+                        + ex.getMessage());
+            } finally {
+                if (vecFile != null) {
                     vecFile.close();
                 }
             }
-            
+
         }
 
     }//GEN-LAST:event_saveVecButtonActionPerformed
 
     private void saveBRDFButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveBRDFButtonActionPerformed
-        if(result == null){
+        if (result == null) {
             IJ.showMessage("No results yet!");
             return;
         }
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setMultiSelectionEnabled(false);
-        if(fileChooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION){
+        if (fileChooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
             PrintWriter brdfFile = null;
             try {
                 brdfFile = new PrintWriter(new BufferedWriter(new FileWriter(
                         fileChooser.getSelectedFile())));
-                for(int i = 0; i < result.getGraphBRDF().length;i++){
+                for (int i = 0; i < result.getGraphBRDF().length; i++) {
                     brdfFile.println(result.getAlpha()[i] + "\t" + result.getFinalBRDF()[i]);
                 }
             } catch (IOException ex) {
-                IJ.showMessage("Error writing to file, " +
-                        fileChooser.getSelectedFile().getName() + ": " +
-                        ex.getMessage());
-            }finally{
-                if(brdfFile != null){
+                IJ.showMessage("Error writing to file, "
+                        + fileChooser.getSelectedFile().getName() + ": "
+                        + ex.getMessage());
+            } finally {
+                if (brdfFile != null) {
                     brdfFile.close();
                 }
             }
@@ -356,7 +362,6 @@ public class MGPInterface extends javax.swing.JFrame {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         refreshImages();
     }//GEN-LAST:event_jButton1ActionPerformed
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField areaTextField;
     private javax.swing.JComboBox bComboBox;
@@ -417,7 +422,7 @@ public class MGPInterface extends javax.swing.JFrame {
         leftTextField.setText(Prefs.get("RITMGP.left", ""));
         rightTextField.setText(Prefs.get("RITMGP.right", ""));
         baseCheckBox.setSelected(Prefs.getBoolean("RITMGP.base", false));
-        if(baseCheckBox.isSelected()){
+        if (baseCheckBox.isSelected()) {
             leftTextField.setEditable(false);
             rightTextField.setEditable(false);
             leftTextField.setText("");
