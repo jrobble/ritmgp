@@ -71,9 +71,9 @@ public class MGPInterface extends javax.swing.JFrame {
         dComboBox = new javax.swing.JComboBox();
         bComboBox = new javax.swing.JComboBox();
         jLabel9 = new javax.swing.JLabel();
-        jButton3 = new javax.swing.JButton();
+        analyzeButton = new javax.swing.JButton();
         saveBRDFButton = new javax.swing.JButton();
-        jButton1 = new javax.swing.JButton();
+        refreshButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -124,10 +124,10 @@ public class MGPInterface extends javax.swing.JFrame {
 
         jLabel9.setText("Enter 1 if measuring a reference sample");
 
-        jButton3.setText("Analyze");
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
+        analyzeButton.setText("Analyze");
+        analyzeButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
+                analyzeButtonActionPerformed(evt);
             }
         });
 
@@ -139,10 +139,10 @@ public class MGPInterface extends javax.swing.JFrame {
             }
         });
 
-        jButton1.setText("Refresh images");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        refreshButton.setText("Refresh images");
+        refreshButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                refreshButtonActionPerformed(evt);
             }
         });
 
@@ -185,9 +185,9 @@ public class MGPInterface extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel9)
-                            .addComponent(jButton1)))
+                            .addComponent(refreshButton)))
                     .addComponent(baseCheckBox, javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jButton3, javax.swing.GroupLayout.Alignment.LEADING))
+                    .addComponent(analyzeButton, javax.swing.GroupLayout.Alignment.LEADING))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -201,7 +201,7 @@ public class MGPInterface extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
                     .addComponent(dComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton1))
+                    .addComponent(refreshButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
@@ -228,7 +228,7 @@ public class MGPInterface extends javax.swing.JFrame {
                     .addComponent(rightTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel8))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton3)
+                .addComponent(analyzeButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(8, 8, 8)
@@ -241,10 +241,15 @@ public class MGPInterface extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+    private void analyzeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_analyzeButtonActionPerformed
         if (imageTitles.length == 0 || bComboBox.getSelectedItem() == null
                 || dComboBox.getSelectedItem() == null) {
             IJ.showMessage("Missing at least one image selection.");
+            return;
+        }
+        if(bComboBox.getSelectedItem().toString().equals(
+                dComboBox.getSelectedItem().toString())){
+            IJ.showMessage("Bright and dark images are the same image");
             return;
         }
         try {
@@ -264,7 +269,7 @@ public class MGPInterface extends javax.swing.JFrame {
             Plot BRDF = new Plot("BRDF", "alpha", "intensity", xs, result.getGraphBRDF());
             BRDF.setLimits(MathUtil.min(xs), MathUtil.max(xs),
                     MathUtil.min(result.getGraphBRDF()) - MathUtil.max(result.getGraphBRDF()) / 5,
-                    MathUtil.max(result.getGraphBRDF()));
+                    MathUtil.max(result.getGraphBRDF()) + MathUtil.max(result.getGraphBRDF()) / 5);
             double baselineX1 = result.getLeftAngle();
             double baselineY1 = MathUtil.linterp(xs, result.getGraphBRDF(), baselineX1);
             double baselineX2 = result.getRightAngle();
@@ -293,7 +298,7 @@ public class MGPInterface extends javax.swing.JFrame {
         } catch (NumberFormatException e) {
             IJ.showMessage("Please enter a value in all editable fields.");
         }
-    }//GEN-LAST:event_jButton3ActionPerformed
+    }//GEN-LAST:event_analyzeButtonActionPerformed
 
     private void baseCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_baseCheckBoxActionPerformed
         leftTextField.setEditable(!baseCheckBox.isSelected());
@@ -359,18 +364,17 @@ public class MGPInterface extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_saveBRDFButtonActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void refreshButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshButtonActionPerformed
         refreshImages();
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_refreshButtonActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton analyzeButton;
     private javax.swing.JTextField areaTextField;
     private javax.swing.JComboBox bComboBox;
     private javax.swing.JCheckBox baseCheckBox;
     private javax.swing.JComboBox dComboBox;
     private javax.swing.JTextField fStopTextField;
     private javax.swing.JTextField fovTextField;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton3;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -383,6 +387,7 @@ public class MGPInterface extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextField leftTextField;
     private javax.swing.JTextField reflTextField;
+    private javax.swing.JButton refreshButton;
     private javax.swing.JTable resultsTable;
     private javax.swing.JTextField rightTextField;
     private javax.swing.JButton saveBRDFButton;
@@ -396,7 +401,7 @@ public class MGPInterface extends javax.swing.JFrame {
 
     private void refreshImages() {
         int[] wList = WindowManager.getIDList(); //ij.WindowManager
-        if (wList == null || wList.length < 2) {
+        if (wList == null) {
             imageTitles = new String[0];
             initComboBoxes();
             return;
