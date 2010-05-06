@@ -1,7 +1,6 @@
 package ritmgp.model;
 
 import ij.ImagePlus;
-import java.util.Arrays;
 import ritmgp.util.MathUtil;
 import ritmgp.util.Matrix;
 
@@ -21,8 +20,8 @@ public class MGPAlgorithm {
     private double leftAngle;
     private double rightAngle;
 
-    private static double workingDist = 165; //6 inches in mm
-    private static double instAngle = 10;
+    private static double workingDist = 165; //172.72 for our device
+    private static double instAngle = 10; //19 degrees for our device?
     private static double cylDiam = 20; //cylinder diameter
 
     public MGPAlgorithm(ImagePlus bright, ImagePlus dark, double refArea,
@@ -227,7 +226,7 @@ public class MGPAlgorithm {
             }
         }
         
-        int JL = MathUtil.max(JWL);
+        int JL = MathUtil.max(JWL) + 2;
         for (int j = 0; j < numCols; j++) {
             if (alpha[j] < 0) {
                 JWR[j] = 0;
@@ -237,7 +236,7 @@ public class MGPAlgorithm {
                 JWR[j] = j;
             }
         }
-        int JR = MathUtil.max(JWR);
+        int JR = MathUtil.max(JWR) - 2;
         //auto baseline
 
         //baseline correction
@@ -274,14 +273,7 @@ public class MGPAlgorithm {
             BRDF7[j] = BRDF77[j] < 0 ? 0 : BRDF77[j];
         }
         //baseline correction
-        System.out.println("BRDF0" + Arrays.toString(BRDF0));
-        System.out.println("BRDF1" + Arrays.toString(BRDF1));
-        System.out.println("BRDF2" + Arrays.toString(BRDF2));
-        System.out.println("BRDF4" + Arrays.toString(BRDF4));
-        System.out.println("BRDF5" + Arrays.toString(BRDF5));
-        System.out.println("BRDF6" + Arrays.toString(BRDF6));
-        System.out.println("BRDF7" + Arrays.toString(BRDF7));
-        System.out.println("BRDF77" + Arrays.toString(BRDF77));
+        
         //calibrating the BRDF
         double A0 = 0;
         double[] BRDF8 = new double[numCols];
@@ -370,7 +362,7 @@ public class MGPAlgorithm {
             M4 += PDF[j] * Math.pow(alpha[j], 4);
         }
         final double sigma = Math.sqrt(M2);
-        final double skewness = M3 / Math.pow(M2, 3/2);
+        final double skewness = M3 / Math.pow(M2, 3.0 / 2);
         final double kurtosis = M4 / (M2 * M2) - 3;
         //stats
 
