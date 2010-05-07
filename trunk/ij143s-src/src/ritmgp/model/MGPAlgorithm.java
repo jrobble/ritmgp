@@ -20,9 +20,9 @@ public class MGPAlgorithm {
     private double leftAngle;
     private double rightAngle;
 
-    private static double workingDist = 165; //172.72 for our device
-    private static double instAngle = 10; //19 degrees for our device?
-    private static double cylDiam = 20; //cylinder diameter
+    private static double workingDist = 172.72; //172.72 for our device
+    private static double instAngle = 17; //19 degrees for our device?
+    private static double cylDiam = 30; //cylinder diameter
 
     public MGPAlgorithm(ImagePlus bright, ImagePlus dark, double refArea,
             double refReflect, double fov, double fStop, boolean autoBaseline,
@@ -35,7 +35,7 @@ public class MGPAlgorithm {
         this.autoBaseline = autoBaseline;
         this.leftAngle = leftAngle;
         this.rightAngle = rightAngle;
-        this.fov = fov;
+        this.fov = fov * 0.396875; //convert from 64ths in to mm
     }
     
     /**
@@ -56,8 +56,8 @@ public class MGPAlgorithm {
         int numCols = brightMat.getCols();
         int numRows = brightMat.getRows();
         //irradiance difference
-        Matrix diff0 = Matrix.subtract(brightMat, darkMat);
-        diff0 = Matrix.divideScalar(diff0, fStop); //gain is 1
+        Matrix diff0 = Matrix.subtract(brightMat, darkMat); //deltaI0 in MathCAD
+        diff0 = Matrix.divideScalar(diff0, fStop * 1); //gain is 1
 
         Matrix diff = Matrix.zeroNegatives(diff0);
         //irradiance difference
@@ -368,7 +368,7 @@ public class MGPAlgorithm {
 
         Double[] results = {A, wHalf, w10, h, rho, granularity, ap, sigma,
                             skewness, kurtosis};
-        return new MGPResult(results, BRDF2, alphaLeft, alphaRight, alpha, BRDF8);
+        return new MGPResult(results, BRDF4, alphaLeft, alphaRight, alpha, BRDF8);
     }
 
     private double[][] getPixels(ImagePlus image) {
