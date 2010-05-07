@@ -19,14 +19,13 @@ import ritmgp.util.MathUtil;
 
 /**
  *
- * @author Mike
+ * @author Mike Neurohr
  */
 public class MGPInterface extends javax.swing.JFrame {
 
     private String[] imageTitles;
     private MGPResult result;
 
-    /** Creates new form InterfaceDemo */
     public MGPInterface(String[] imageTitles) {
         initComponents();
         this.imageTitles = imageTitles;

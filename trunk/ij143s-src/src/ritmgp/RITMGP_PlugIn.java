@@ -1,6 +1,5 @@
 package ritmgp;
 
-import ij.IJ;
 import ij.ImagePlus;
 import ij.WindowManager;
 import ij.plugin.PlugIn;
