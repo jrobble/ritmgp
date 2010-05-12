@@ -282,7 +282,7 @@ public class MGPAlgorithm {
             BRDF8[j] = BRDF7[j] / refArea;
         }
 
-        final double A = A0 / refArea;
+        final double A = A0 * alphaInt / refArea;
         //calibrating the BRDF
 
         //stats
@@ -370,7 +370,13 @@ public class MGPAlgorithm {
                             skewness, kurtosis};
         return new MGPResult(results, BRDF4, alphaLeft, alphaRight, alpha, BRDF8);
     }
-
+    /**
+     * Converts an image from an ImagePlus to a double[][] of
+     * grayscale pixel values.
+     *
+     * @param image the image to convert
+     * @return a 2D array of grayscale pixel values
+     */
     private double[][] getPixels(ImagePlus image) {
         double[][] ans = new double[image.getHeight()][image.getWidth()];
         for(int i = 0; i < image.getHeight(); i++){
