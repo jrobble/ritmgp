@@ -20,8 +20,8 @@ public class MGPAlgorithm {
     private double leftAngle;
     private double rightAngle;
 
-    private static double workingDist = 172.72; //172.72 for our device
-    private static double instAngle = 17; //19 degrees for our device?
+    private static double workingDist = 183.27; //183.27 for our device
+    private static double instAngle = 18.25; //19 degrees for our device?
     private static double cylDiam = 30; //cylinder diameter
 
     public MGPAlgorithm(ImagePlus bright, ImagePlus dark, double refArea,
@@ -35,7 +35,7 @@ public class MGPAlgorithm {
         this.autoBaseline = autoBaseline;
         this.leftAngle = leftAngle;
         this.rightAngle = rightAngle;
-        this.fov = fov * 0.396875; //convert from 64ths in to mm
+        this.fov = fov;
     }
     
     /**
@@ -187,8 +187,17 @@ public class MGPAlgorithm {
 
         double alphaMin = MathUtil.min(alpha);
         double alphaMax = MathUtil.max(alpha);
-        double MaxBRDF4 = MathUtil.max(BRDF4);
-
+        double maxBRDF4 = MathUtil.max(BRDF4);
+        double maxBRDF420 = maxBRDF4 / 20;
+//        int maxBRDF4j = 0;
+//
+//        for(int j = 0; j < numCols; j++){
+//            if(BRDF4[j] == maxBRDF4){
+//                maxBRDF4j = j;
+//            }
+//        }
+//
+//        double maxBRDF4alpha = alpha[maxBRDF4j];
         final double granularity = MathUtil.max(noise);
         //Generate functions at equally spaced angles
 
@@ -196,10 +205,10 @@ public class MGPAlgorithm {
         double alphaLeft, alphaRight;
 
         int[] JLV = new int[numCols];
-        for (int j = 0; j < JLV.length; j++) {
+        for (int j = 0; j < numCols; j++) {
             if (alpha[j] > 0) {
                 JLV[j] = 0;
-            } else if (BRDF4[j] > MaxBRDF4 / 20) {
+            } else if (BRDF4[j] > maxBRDF420) {
                 JLV[j] = 0;
             } else {
                 JLV[j] = j;
@@ -226,7 +235,7 @@ public class MGPAlgorithm {
             }
         }
         
-        int JL = MathUtil.max(JWL) + 2;
+        int JL = Math.min(MathUtil.max(JWL) + 2, numCols);
         for (int j = 0; j < numCols; j++) {
             if (alpha[j] < 0) {
                 JWR[j] = 0;
@@ -236,7 +245,7 @@ public class MGPAlgorithm {
                 JWR[j] = j;
             }
         }
-        int JR = MathUtil.max(JWR) - 2;
+        int JR = Math.max(MathUtil.max(JWR) - 2, 0);
         //auto baseline
 
         //baseline correction
@@ -293,6 +302,11 @@ public class MGPAlgorithm {
 
         int[] halfLV = new int[numCols];
         int[] halfRV = new int[numCols];
+
+        double h10 = h / 10;
+
+        int[] tenthLV = new int[numCols];
+        int[] tenthRV = new int[numCols];
         for(int j = 0;j < halfLV.length; j++){
             if(alpha[j] > 0){
                 halfLV[j] = 0;
@@ -309,24 +323,8 @@ public class MGPAlgorithm {
             }else{
                 halfRV[j] = 0;
             }
-        }
 
-        int halfL = MathUtil.max(halfLV);
-        int halfR = MathUtil.max(halfRV);
-
-        //VwLeft and VwRight were only used to create Yw which was not used
-        double alphaWL = alpha[halfL];
-        double alphaWR = alpha[halfR];
-
-        //Xw and Yw were not used
-        final double wHalf = alphaWR - alphaWL;
-
-        double h10 = h / 10;
-
-        int[] tenthLV = new int[numCols];
-        int[] tenthRV = new int[numCols];
-        for(int j = 0;j < tenthLV.length; j++){
-            if(alpha[j] > 0){
+             if(alpha[j] > 0){
                 tenthLV[j] = 0;
             }else if(BRDF8[j] > h10){
                 tenthLV[j] = 0;
@@ -342,6 +340,16 @@ public class MGPAlgorithm {
                 tenthRV[j] = 0;
             }
         }
+
+        int halfL = MathUtil.max(halfLV);
+        int halfR = MathUtil.max(halfRV);
+
+        //VwLeft and VwRight were only used to create Yw which was not used
+        double alphaWL = alpha[halfL];
+        double alphaWR = alpha[halfR];
+
+        //Xw and Yw were not used
+        final double wHalf = alphaWR - alphaWL;
 
         int tenthL = MathUtil.max(tenthLV);
         int tenthR = MathUtil.max(tenthRV);
