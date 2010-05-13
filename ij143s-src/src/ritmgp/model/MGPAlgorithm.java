@@ -291,6 +291,8 @@ public class MGPAlgorithm {
             BRDF8[j] = BRDF7[j] / refArea;
         }
 
+        //changed from MathCAD code to correct for FOV changes between the
+        //refernce sample and measured sample
         final double A = A0 * alphaInt / refArea;
         //calibrating the BRDF
 
