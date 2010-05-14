@@ -189,6 +189,7 @@ public class MGPAlgorithm {
         double alphaMax = MathUtil.max(alpha);
         double maxBRDF4 = MathUtil.max(BRDF4);
         double maxBRDF420 = maxBRDF4 / 20;
+        //Attempts to correct for the shift from improper alignment
 //        int maxBRDF4j = 0;
 //
 //        for(int j = 0; j < numCols; j++){

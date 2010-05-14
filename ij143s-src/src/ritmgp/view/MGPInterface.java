@@ -107,7 +107,7 @@ public class MGPInterface extends javax.swing.JFrame {
 
         jLabel4.setText("Reference Area:");
 
-        jLabel5.setText("F-stop Measurement:");
+        jLabel5.setText("Exposure Index:");
 
         jLabel6.setText("Field of View:");
 
