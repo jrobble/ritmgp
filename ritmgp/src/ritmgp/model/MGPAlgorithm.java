@@ -223,6 +223,7 @@ public class MGPAlgorithm {
         double alphaBase = alphaX > alphaLimit ? alphaLimit : alphaX;
 
         int[] JWL = new int[numCols];
+        int[] JWR = new int[numCols];
         for (int j = 0; j < JWL.length; j++) {
             if (alpha[j] > 0) {
                 JWL[j] = 0;
@@ -231,12 +232,6 @@ public class MGPAlgorithm {
             } else {
                 JWL[j] = j;
             }
-        }
-
-        int JL = MathUtil.max(JWL);
-
-        int[] JWR = new int[numCols];
-        for (int j = 0; j < JWR.length; j++) {
             if (alpha[j] < 0) {
                 JWR[j] = 0;
             } else if (alpha[j] > -alpha[JLv]) {
@@ -245,7 +240,7 @@ public class MGPAlgorithm {
                 JWR[j] = j;
             }
         }
-
+        int JL = MathUtil.max(JWL);
         int JR = MathUtil.max(JWR);
         //auto baseline
 
@@ -265,17 +260,13 @@ public class MGPAlgorithm {
         double[] Y = {vLeft, vRight};
 
         double[] VB = new double[numCols];
+        double[] BRDF5 = new double[numCols];
+        double[] BRDF6 = new double[numCols];
+        double[] BRDFx = new double[numCols];
+        double[] BRDF7 = new double[numCols];
         for(int j = 0; j < VB.length; j++){
             VB[j] = MathUtil.linterp(X, Y, alpha[j]);
-        }
-
-        double[] BRDF5 = new double[numCols];
-        for(int j = 0; j < VB.length; j++){
             BRDF5[j] = BRDF4[j] - VB[j];
-        }
-
-        double[] BRDF6 = new double[numCols];
-        for (int j = 0; j < BRDF6.length; j++) {
             if (alpha[j] < alphaLeft) {
                 BRDF6[j] = 0;
             } else if (alpha[j] > alphaRight) {
@@ -283,15 +274,7 @@ public class MGPAlgorithm {
             } else {
                 BRDF6[j] = BRDF5[j];
             }
-        }
-
-        double[] BRDFx = new double[numCols];
-        for (int j = 0; j < BRDFx.length; j++) {
             BRDFx[j] = BRDF6[j] - VB[j];
-        }
-
-        double[] BRDF7 = new double[numCols];
-        for (int j = 0; j < BRDF7.length; j++) {
             BRDF7[j] = BRDFx[j] < 0 ? 0 : BRDFx[j];
         }
         //baseline correction
@@ -304,7 +287,7 @@ public class MGPAlgorithm {
             BRDF8[j] = BRDF7[j] / refArea;
         }
 
-        final double A = A0 / refArea;
+        final double A = A0 * alphaInt/ refArea;
         //calibrating the BRDF
 
         //stats
